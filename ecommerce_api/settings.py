@@ -71,18 +71,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ecommerce_api.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'e-commerce',
-        'PORT': '5432',
-        'HOST': 'localhost',
-        'USER': 'postgres',
-        'PASSWORD': 'super'
-    }
-}
+try:
+    from ecommerce_api.local_settings import *
+except ImportError:
+    pass
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
