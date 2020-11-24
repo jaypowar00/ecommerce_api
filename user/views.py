@@ -98,7 +98,6 @@ def register(request):
         dup = str(err).split('user_details_')[1].split('_key')[0]
         return Response({'response': f'{dup} already taken by another user, please user another {dup} and try again!', 'duplicate': dup})
     except IndexError as err:
-        # print(err)
         return Response({'response': 'duplication found!', 'status': False})
     if jsn:
         return Response({'response': 'user created!', 'status': True, 'context': context})

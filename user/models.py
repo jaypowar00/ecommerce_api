@@ -39,7 +39,6 @@ class Address(models.Model):
     country = models.CharField(max_length=50, null=True)
     state = models.CharField(max_length=50, null=True)
     pinCode = models.CharField(max_length=10, null=True)
-    # type = models.CharField(max_length=4, choices=ADDRESS_TYPES, default=HOME_ADDRESS, null=True)
     type = models.CharField(max_length=10, null=True)
 
     def __str__(self):
