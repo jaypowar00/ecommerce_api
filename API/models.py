@@ -1,6 +1,6 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-import uuid
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 
 class Product(models.Model):
@@ -35,28 +35,3 @@ class ProductDetails(models.Model):
 
     def __str__(self):
         return f"{self.product_id.productId} - {self.product_id.name}"
-
-
-class Details(models.Model):
-    userId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=40)
-    email = models.EmailField(max_length=320)
-    password = models.CharField(max_length=32)
-    phone = models.PositiveBigIntegerField()
-
-
-class Address(models.Model):
-    HOME_ADDRESS = 'H'
-    WORK_ADDRESS = 'W'
-    ADDRESS_TYPES = [
-        (HOME_ADDRESS, 'Home'),
-        (WORK_ADDRESS, 'Work')
-    ]
-    userId = models.ForeignKey(Details, on_delete=models.CASCADE)
-    addressId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    type = models.CharField(max_length=1, choices=ADDRESS_TYPES, default=HOME_ADDRESS)
-    area = models.CharField(max_length=20)
-    city = models.CharField(max_length=20)
-    pinCode = models.IntegerField()
-    state = models.CharField(max_length=30)
-    country = models.CharField(max_length=20)
