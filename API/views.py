@@ -20,12 +20,12 @@ def home(request):
     ''')
 
 
-class DetailsView(viewsets.ModelViewSet):
-    serializer_class = DetailsSerializer
-    queryset = Details.objects.all()
-
-
-class AddressView(viewsets.ModelViewSet):
-    serializer_class = AddressSerializer
-    queryset = Address.objects.all()
+# class DetailsView(viewsets.ModelViewSet):
+#     serializer_class = DetailsSerializer
+#     queryset = Details.objects.all()
+#
+#
+# class AddressView(viewsets.ModelViewSet):
+#     serializer_class = AddressSerializer
+#     queryset = Address.objects.all()
 
