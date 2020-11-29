@@ -29,6 +29,8 @@ class SafeJWTAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed('access token expired!')
         except jwt.InvalidSignatureError:
             raise  exceptions.AuthenticationFailed('invalid token!')
+        except jwt.DecodeError:
+            raise exceptions.AuthenticationFailed('invalid token!')
         except IndexError:
             raise exceptions.AuthenticationFailed('Token prefix missing')
 
