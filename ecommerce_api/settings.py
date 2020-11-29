@@ -91,7 +91,7 @@ DATABASES = {
         'USER': 'vmkijycgpkvvqh',  # 'postgres',
         'PASSWORD': '3e7d1b2695035d8429ec57a3397328adeaf0ec0eca4bc628839c40096c563b48',  # 'super'
     }
-}#
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
