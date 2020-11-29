@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
+    'https://e-cmrc-stackunderflow-api.herokuapp.com/',
 ]
 blackListedTokens = set()
 # Application definition
