@@ -133,6 +133,7 @@ def login(request):
     response.set_cookie(key='refreshtoken', value=refresh_token, httponly=True)
     response.data = {
         'access_token': access_token,
+        'refreshtoken': refresh_token,
         'user': serialized_user,
         'status': True
     }
