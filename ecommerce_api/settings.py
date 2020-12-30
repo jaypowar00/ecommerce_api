@@ -132,7 +132,7 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:5000',
     'http://localhost:3000',
     'https://jaypowar00.github.io',
-    'https://stackunderflow-e-commerce.netlify.app/',
+    'https://stackunderflow-e-commerce.netlify.app',
 ]
 
 REST_FRAMEWORK = {

@@ -11,16 +11,17 @@ from user.models import Details, Address
 class Product(models.Model):
     productId = models.AutoField(primary_key=True)
     name = models.CharField(help_text='Name of product', max_length=200)
+    productSlug = models.SlugField(max_length=500, default='', unique=True)
     price = models.PositiveBigIntegerField(help_text='Price of Product', default=0)
     manufacturer = models.CharField(help_text='Name of manufacturer', max_length=200, default='')
-    thumbnails = models.CharField(help_text='Paste link of thumbnail photo', max_length=300, default='', blank=True)
+    thumbnail = models.CharField(help_text='Paste link of thumbnail photo', max_length=300, default='', blank=True)
     stock = models.PositiveBigIntegerField(help_text='Available quantity of product', default=0)
     isInStock = models.BooleanField(help_text='is product available for purchases?', default=False)
     paymentOption = models.CharField(help_text="What's the payment options available on product", max_length=300,
                                      default='Cash On Delivery (C.O.D.)')
 
     def __str__(self):
-        return f"{self.productId} - {self.name}"
+        return f"{self.productId}) {self.name}"
 
 
 class ProductDetails(models.Model):

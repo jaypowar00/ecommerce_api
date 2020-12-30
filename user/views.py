@@ -24,7 +24,6 @@ def profile(request):
         serialized_user = DetailsSerializer(user).data
     except AttributeError:
         return Response({'response': 'authorization credentials missing!', 'status': False})
-    print('1 ')
     address = Address.objects.filter(userId=user).first()
     if address:
         serialized_address = AddressSerializer(address).data
