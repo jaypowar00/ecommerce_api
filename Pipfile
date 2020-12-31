@@ -21,6 +21,7 @@ Markdown = "==3.3"
 djangorestframework-simplejwt = "*"
 pyjwt = "*"
 django-cors-headers = "*"
+shortuuid = "*"
 
 [requires]
 python_version = "3.8"
