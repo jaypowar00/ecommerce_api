@@ -1,17 +1,22 @@
+import uuid
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils import timezone
+
+from user.models import Details, Address
 
 
 class Product(models.Model):
     productId = models.AutoField(primary_key=True)
     name = models.CharField(help_text='Name of product', max_length=200)
-    price = models.PositiveIntegerField(help_text='Price of Product', default=0)
+    price = models.PositiveBigIntegerField(help_text='Price of Product', default=0)
     manufacturer = models.CharField(help_text='Name of manufacturer', max_length=200, default='')
-    thumbnails = models.CharField(help_text='Paste link of thumbnail photo', max_length=100, default='', blank=True)
+    thumbnails = models.CharField(help_text='Paste link of thumbnail photo', max_length=300, default='', blank=True)
     stock = models.PositiveBigIntegerField(help_text='Available quantity of product', default=0)
     isInStock = models.BooleanField(help_text='is product available for purchases?', default=False)
-    paymentOption = models.CharField(help_text="What's the payment options available on product", max_length=100,
+    paymentOption = models.CharField(help_text="What's the payment options available on product", max_length=300,
                                      default='Cash On Delivery (C.O.D.)')
 
     def __str__(self):
@@ -35,3 +40,27 @@ class ProductDetails(models.Model):
 
     def __str__(self):
         return f"{self.product_id.productId} - {self.product_id.name}"
+
+
+class QuantityProduct(models.Model):
+    productId = models.ForeignKey(Product, on_delete=models.CASCADE)
+    prod_quantity = models.PositiveIntegerField(null=True)
+
+
+class Order(models.Model):
+    orderId = models.UUIDField(auto_created=True, default=uuid.uuid4, unique=True)
+    orderState = models.CharField(max_length=15, null=True)
+    date_created = models.DateTimeField(default=timezone.now)
+    userId = models.ForeignKey(Details, on_delete=models.CASCADE, null=True)
+    paymentMethod = models.CharField(max_length=20, null=True)
+    finalAmount = models.CharField(max_length=80, null=True)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)
+    products = models.ManyToManyField(QuantityProduct)
+
+
+class Cart(models.Model):
+    products = models.ManyToManyField(QuantityProduct)
+    userId = models.OneToOneField(Details, on_delete=models.CASCADE, null=True)
+    paymentMethod = models.CharField(max_length=20, null=True)
+    finalAmount = models.CharField(max_length=80, null=True)
+    # products = models.ManyToManyField(Product)

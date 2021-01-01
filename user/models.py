@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Details(AbstractBaseUser, PermissionsMixin):
-    # userId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=40, unique=True, null=True)
     is_staff = models.BooleanField(default=True)
@@ -31,7 +30,6 @@ class Address(models.Model):
         (HOME_ADDRESS, 'Home'),
         (WORK_ADDRESS, 'Work')
     ]
-    # addressId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     userId = models.ForeignKey(Details, on_delete=models.CASCADE, null=True)
     area = models.CharField(max_length=50, null=True)
     landmark = models.CharField(max_length=50, null=True)
