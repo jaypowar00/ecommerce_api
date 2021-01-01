@@ -30,22 +30,7 @@ def products_view(request):
     query_errors = []
     if query_params_n > 0:
         while True:
-            if 'orderby' in query_params:
-                orderby = query_params['orderby'][0]
-                del query_params['orderby']
-                done_query_param_n += 1
-                if orderby == '-price' or orderby == '-name' or orderby == '-stock' or orderby == '-manufacturer' or orderby == 'price' or orderby == 'name' or orderby == 'stock' or orderby == 'manufacturer':
-                    products = products.order_by(orderby)
-                    if done_query_param_n == query_params_n:
-                        resultProducts = serialize_products_from_instance(products)
-                        if len(query_errors) > 0:
-                            return Response({'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
-                        return Response({'response': resultProducts, 'status': True})
-                else:
-                    query_errors.append('invalid orderby value received in url query')
-                    if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False, 'error': True})
-            elif 'price>' in query_params:
+            if 'price>' in query_params:
                 price_filter = str(query_params['price>'][0])
                 del query_params['price>']
                 done_query_param_n += 1
@@ -73,6 +58,116 @@ def products_view(request):
                         return Response({'response': resultProducts, 'status': True})
                 else:
                     query_errors.append("invalid value for query parameter 'price<'")
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': query_errors, 'status': False, 'error': True})
+            elif 'cate' in query_params:
+                category_query = query_params['cate'][0]
+                del query_params['cate']
+                done_query_param_n += 1
+                category_query = category_query.split('-')
+                if len(category_query) > 0:
+                    products = products.filter(productdetails__categories__contains=category_query)
+                    resultProducts = serialize_products_from_instance(products)
+                    if len(query_errors) > 0:
+                        return Response(
+                            {'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': resultProducts, 'status': True})
+                else:
+                    query_errors.append("invalid value for query parameter 'cate'")
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': query_errors, 'status': False})
+            elif 'pay' in query_params:
+                pay_opt = query_params['pay'][0]
+                del query_params['pay']
+                done_query_param_n += 1
+                if pay_opt == 'c' or pay_opt == 'o':
+                    if pay_opt == 'c':
+                        print("cash on delivery filter")
+                        products = products.filter(paymentOption='Cash On Delivery')
+                    else:
+                        print("online filter")
+                        products = products.filter(paymentOption='Online')
+                    resultProducts = serialize_products_from_instance(products)
+                    if len(query_errors) > 0:
+                        return Response(
+                            {'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': resultProducts, 'status': True})
+                else:
+                    query_errors.append({'response': "invalid value for query parameter 'pay'"})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': query_errors, 'status': False})
+            elif 'stock' in query_params:
+                stock = query_params['stock'][0]
+                del query_params['stock']
+                done_query_param_n += 1
+                if stock == 't' or stock == 'f':
+                    if stock == 't':
+                        products = products.filter(isInStock=True)
+                    else:
+                        products = products.filter(isInStock=False)
+                    resultProducts = serialize_products_from_instance(products)
+                    if len(query_errors) > 0:
+                        return Response({'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': resultProducts, 'status': True})
+                else:
+                    query_errors.append({'response': "invalid value for query parameter 'stock'"})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': query_errors, 'status': False})
+            elif 'rating_l' in query_params:
+                rate_l = query_params['rating_l'][0]
+                del query_params['rating_l']
+                done_query_param_n += 1
+                if len(rate_l) > 0 and rate_l.isdigit:
+                    products = products.filter(productdetails__rating__lte=float(rate_l))
+                    resultProducts = serialize_products_from_instance(products)
+                    if len(query_errors) > 0:
+                        return Response(
+                            {'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': resultProducts, 'status': True})
+                else:
+                    query_errors.append({'response': "invalid value for query parameter 'rating_l'"})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': query_errors, 'status': False})
+            elif 'rating_g' in query_params:
+                rate_g = query_params['rating_g'][0]
+                del query_params['rating_g']
+                done_query_param_n += 1
+                if len(rate_g) > 0 and rate_g.isdigit:
+                    products = products.filter(productdetails__rating__gte=float(rate_g))
+                    resultProducts = serialize_products_from_instance(products)
+                    if len(query_errors) > 0:
+                        return Response(
+                            {'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': resultProducts, 'status': True})
+                else:
+                    query_errors.append({'response': "invalid value for query parameter 'rating_l'"})
+                    if done_query_param_n == query_params_n:
+                        return Response({'response': query_errors, 'status': False})
+            elif 'orderby' in query_params:
+                orderby = query_params['orderby'][0]
+                del query_params['orderby']
+                done_query_param_n += 1
+                if orderby == '-price' or orderby == '-name' or orderby == '-stock' or orderby == '-manufacturer' or orderby == 'price' or orderby == 'name' or orderby == 'stock' or orderby == 'manufacturer' or orderby == 'rating' or orderby == '-rating':
+                    if orderby == 'rating':
+                        print("rating order")
+                        products = products.order_by("productdetails__rating")
+                    elif orderby == '-rating':
+                        print("-rating order")
+                        products = products.order_by("-productdetails__rating")
+                    else:
+                        products = products.order_by(orderby)
+                    if done_query_param_n == query_params_n:
+                        resultProducts = serialize_products_from_instance(products)
+                        if len(query_errors) > 0:
+                            return Response({'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                        return Response({'response': resultProducts, 'status': True})
+                else:
+                    query_errors.append('invalid orderby value received in url query')
                     if done_query_param_n == query_params_n:
                         return Response({'response': query_errors, 'status': False, 'error': True})
 
