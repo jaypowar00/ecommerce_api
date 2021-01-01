@@ -27,6 +27,8 @@ def products_view(request):
     done_query_param_n = 0
     print("no of params : " + str(query_params_n))
     products = Product.objects.all()
+    categories_values = fetch_categories_from_product_instance(products)
+    print(categories_values)
     query_errors = []
     if query_params_n > 0:
         while True:
@@ -172,8 +174,8 @@ def products_view(request):
                         return Response({'response': query_errors, 'status': False, 'error': True})
 
     if query_params_n == 0:
-        prod = Product.objects.all()
-        resultProducts = serialize_products_from_instance(prod)
+        resultProducts = serialize_products_from_instance(products.order_by('productId'))
+        resultProducts['categories'] = categories_values
         return Response({'response': resultProducts, 'status': True})
     else:
         return Response({'response': 'invalid url request', 'status': False})
@@ -181,7 +183,7 @@ def products_view(request):
 
 def serialize_products_from_instance(products):
     serialized_products = ProductSerializer(products, many=True).data
-    products_result = {'total_products': 0, 'products': []}
+    products_result = {'total_products': 0, 'categories': fetch_categories_from_product_instance(products), 'products': []}
     totalProducts = len(serialized_products)
     for product in serialized_products:
         product = dict(product)
@@ -189,6 +191,16 @@ def serialize_products_from_instance(products):
     products_result['total_products'] = totalProducts
     return products_result
 
+
+def fetch_categories_from_product_instance(products):
+    categories_values = list(products.values('productdetails__categories'))
+    cate_s = set()
+    for cat_d in categories_values:
+        if 'productdetails__categories' in cat_d:
+            for category in cat_d['productdetails__categories']:
+                cate_s.add(category)
+    categories_values = list(cate_s)
+    return categories_values
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -244,6 +256,7 @@ def create_product(request):
         ]
         optional_fields = [
             "manufacturer",
+            "brand",
             "paymentOption",
             "description",
             "countryOfOrigin",
@@ -263,6 +276,7 @@ def create_product(request):
         product_stock = jsonData['stock'] if type(jsonData['stock']) == int else 0
         product_inStock = product_stock > 0
         product_manufacturer = jsonData['manufacturer'] if 'manufacturer' in jsonData else 'Anonymous'
+        product_brand = jsonData['brand'] if 'brand' in jsonData else None
         product_paymentOption = jsonData['paymentOption'] if 'paymentOption' in jsonData else 'Cash On Delivery'
         product_description = jsonData['description'] if 'description' in jsonData else 'description not provided by seller'
         product_countryOfOrigin = jsonData['countryOfOrigin'] if 'countryOfOrigin' in jsonData else 'Anonymous'
@@ -285,6 +299,7 @@ def create_product(request):
         product_details = ProductDetails(
             product_id=product,
             description=product_description,
+            brand=product_brand,
             countryOfOrigin=product_countryOfOrigin,
             photos=product_photos,
             categories=product_categories,
@@ -343,6 +358,7 @@ def update_product(request):
         ]
         product_details_fields =[
             "description",
+            "brand",
             "countryOfOrigin",
             "photos",
             "categories",
@@ -376,6 +392,7 @@ def update_product(request):
             updated_product_details = ProductDetails(
                 product_id_id=product_details.product_id,
                 description=updated_product_data['description'],
+                brand=updated_product_data['brand'],
                 countryOfOrigin=updated_product_data['countryOfOrigin'],
                 photos=updated_product_data['photos'],
                 categories=updated_product_data['categories'],

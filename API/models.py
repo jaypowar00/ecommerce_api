@@ -27,6 +27,7 @@ class Product(models.Model):
 class ProductDetails(models.Model):
     product_id = models.OneToOneField(Product, help_text='Select product ID', on_delete=models.CASCADE,
                                       primary_key=True)
+    brand = models.CharField(max_length=200, default=None, null=True)
     description = models.TextField(help_text='Description of the product', default='')
     countryOfOrigin = models.CharField(help_text="What's the Country of Origin", max_length=20, default=None)
     photos = ArrayField(models.CharField(max_length=450, default=None), blank=True, default=None,
