@@ -24,7 +24,6 @@ def profile(request):
         serialized_user = DetailsSerializer(user).data
     except AttributeError:
         return Response({'response': 'authorization credentials missing!', 'status': False})
-    print('1 ')
     address = Address.objects.filter(userId=user).first()
     if address:
         serialized_address = AddressSerializer(address).data
@@ -133,6 +132,7 @@ def login(request):
     response.set_cookie(key='refreshtoken', value=refresh_token, httponly=True)
     response.data = {
         'access_token': access_token,
+        'refreshtoken': refresh_token,
         'user': serialized_user,
         'status': True
     }

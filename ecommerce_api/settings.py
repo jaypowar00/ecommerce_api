@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'e-cmrc-stackunderflow-api.herokuapp.com',
+    'ecmrce-suflowapi.herokuapp.com',
 ]
 blackListedTokens = set()
 # Application definition
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'ecommerce_api.urls'
@@ -79,7 +81,7 @@ WSGI_APPLICATION = 'ecommerce_api.wsgi.application'
 
 # Database
 try:
-    from ecommerce_api.local_settings import *
+    from ecommerce_api.local_settings import DATABASES
 except ImportError:
     pass
 
@@ -118,6 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 AUTH_USER_MODEL = 'user.Details'
 
@@ -125,7 +128,11 @@ AUTH_USER_MODEL = 'user.Details'
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:5000',
+    'http://127.0.0.1:3000',
     'http://localhost:5000',
+    'http://localhost:3000',
+    'https://jaypowar00.github.io',
+    'https://stackunderflow-e-commerce.netlify.app',
 ]
 
 REST_FRAMEWORK = {
