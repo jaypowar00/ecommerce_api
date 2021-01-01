@@ -68,7 +68,10 @@ def products_view(request):
                 done_query_param_n += 1
                 category_query = category_query.split('-')
                 if len(category_query) > 0:
-                    products = products.filter(productdetails__categories__contains=category_query)
+                    temp_products = products.filter(productId=-1)
+                    for category in category_query:
+                        temp_products = temp_products | products.filter(productdetails__categories__contains=[category])
+                    products = temp_products
                     resultProducts = serialize_products_from_instance(products)
                     if len(query_errors) > 0:
                         return Response(
