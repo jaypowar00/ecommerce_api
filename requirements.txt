@@ -5,14 +5,11 @@ Django==3.1.2
 django-cors-headers==3.6.0
 django-filter==2.4.0
 djangorestframework==3.12.1
-djangorestframework-jwt==1.11.0
 gunicorn==20.0.4
 Markdown==3.3
 psycopg2==2.8.6
-psycopg2-binary==2.8.6
-PyJWT==2.0.0
+PyJWT==1.7.1
 pytz==2020.1
 shortuuid==1.0.1
 sqlparse==0.4.1
 whitenoise==5.2.0
-zipp==3.4.0

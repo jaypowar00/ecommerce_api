@@ -6,7 +6,6 @@ import jwt
 import json
 import shortuuid
 from user.decorators import *
-from .models import *
 from user.models import *
 from .serializers import *
 from user.serializers import *
@@ -14,7 +13,6 @@ from rest_framework.decorators import api_view, permission_classes
 from user.decorators import check_blacklist_token
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 @api_view(['GET'])
