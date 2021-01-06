@@ -28,7 +28,6 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    'e-cmrc-stackunderflow-api.herokuapp.com',
     'ecmrce-suflowapi.herokuapp.com',
 ]
 blackListedTokens = set()
@@ -131,8 +130,6 @@ CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:3000',
     'http://localhost:5000',
     'http://localhost:3000',
-    'https://jaypowar00.github.io',
-    'https://stackunderflow-e-commerce.netlify.app',
 ]
 
 REST_FRAMEWORK = {

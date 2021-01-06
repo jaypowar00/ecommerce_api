@@ -13,10 +13,12 @@ from rest_framework.decorators import api_view, permission_classes
 from user.decorators import check_blacklist_token
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+@ensure_csrf_cookie
 def products_view(request):
     print("query parameters : ", end="")
     query_params = dict(request.query_params)
@@ -203,8 +205,10 @@ def fetch_categories_from_product_instance(products):
     categories_values = list(cate_s)
     return categories_values
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
+@ensure_csrf_cookie
 def product_detailed_view(request):
     query_params = request.query_params
     if 'prdct' in query_params or ('id' in query_params and query_params['id'].isdigit):
@@ -229,6 +233,7 @@ def product_detailed_view(request):
 
 @api_view(['POST'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def create_product(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -321,6 +326,7 @@ def create_product(request):
 
 @api_view(['POST'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def update_product(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -411,6 +417,7 @@ def update_product(request):
 
 @api_view(['POST'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def delete_product(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:

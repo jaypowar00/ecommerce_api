@@ -18,6 +18,7 @@ from API.serializers import *
 
 @api_view(['GET'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def profile(request):
     user = request.user
     try:
@@ -37,6 +38,7 @@ def profile(request):
 
 @api_view(['POST'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def user_address(request):
     jsn = request.data['address']
     area = None if 'area' not in jsn else jsn['area']
@@ -78,6 +80,7 @@ def user_address(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@ensure_csrf_cookie
 def register(request):
     context = {}
     jsn: dict
@@ -111,6 +114,7 @@ def register(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@ensure_csrf_cookie
 def login(request):
     User = get_user_model()
     email = request.data.get('email')
@@ -182,6 +186,7 @@ def logout(request):
 
 @api_view(['POST'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def refresh_token(request):
     User = get_user_model()
     refresh_token = request.COOKIES.get('refreshtoken')
@@ -224,6 +229,7 @@ def delete_user(request):
 
 @api_view(['GET'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def cart_view(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -384,6 +390,7 @@ def change_cart_product_quantity(request):
 
 @api_view(['POST'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def cart_paymentMethod(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -418,6 +425,7 @@ def cart_paymentMethod(request):
 
 @api_view(['GET'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def orders_view(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -456,6 +464,7 @@ def orders_view(request):
 
 @api_view(['POST'])
 @check_blacklist_token
+@ensure_csrf_cookie
 def place_order(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
