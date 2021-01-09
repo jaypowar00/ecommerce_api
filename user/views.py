@@ -1,6 +1,7 @@
+from django.middleware.csrf import get_token
 from django.shortcuts import render
 from rest_framework.response import Response
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from .serializers import DetailsSerializer, AddressSerializer
 from .utils import generate_access_token, generate_refresh_token
@@ -11,14 +12,11 @@ import jwt, json
 from django.conf import settings
 from ecommerce_api.settings import blackListedTokens
 from django.db.utils import IntegrityError
-from .models import Address
-from API.models import *
 from API.serializers import *
 
 
 @api_view(['GET'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def profile(request):
     user = request.user
     try:
@@ -38,7 +36,6 @@ def profile(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def user_address(request):
     jsn = request.data['address']
     area = None if 'area' not in jsn else jsn['area']
@@ -80,7 +77,6 @@ def user_address(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-@ensure_csrf_cookie
 def register(request):
     context = {}
     jsn: dict
@@ -114,7 +110,6 @@ def register(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-@ensure_csrf_cookie
 def login(request):
     User = get_user_model()
     email = request.data.get('email')
@@ -132,11 +127,12 @@ def login(request):
 
     access_token = generate_access_token(user)
     refresh_token = generate_refresh_token(user)
-
+    csrf_token = get_token(request)
     response.set_cookie(key='refreshtoken', value=refresh_token, httponly=True)
     response.data = {
         'access_token': access_token,
-        'refreshtoken': refresh_token,
+        'refresh_token': refresh_token,
+        'csrf_token': csrf_token,
         'user': serialized_user,
         'status': True
     }
@@ -144,7 +140,6 @@ def login(request):
 
 
 @api_view(['POST'])
-@ensure_csrf_cookie
 def logout(request):
     User = get_user_model()
     authorization_header = request.headers.get('Authorization')
@@ -186,7 +181,6 @@ def logout(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def refresh_token(request):
     User = get_user_model()
     refresh_token = request.COOKIES.get('refreshtoken')
@@ -208,7 +202,6 @@ def refresh_token(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def delete_user(request):
     User = get_user_model()
     authorization_header = request.headers.get('Authorization')
@@ -229,7 +222,6 @@ def delete_user(request):
 
 @api_view(['GET'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def cart_view(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -266,7 +258,6 @@ def cart_view(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def add_to_cart(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -310,7 +301,6 @@ def add_to_cart(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def remove_from_cart(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -348,7 +338,6 @@ def remove_from_cart(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def change_cart_product_quantity(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -390,7 +379,6 @@ def change_cart_product_quantity(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def cart_paymentMethod(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -425,7 +413,6 @@ def cart_paymentMethod(request):
 
 @api_view(['GET'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def orders_view(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
@@ -464,7 +451,6 @@ def orders_view(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-@ensure_csrf_cookie
 def place_order(request):
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:

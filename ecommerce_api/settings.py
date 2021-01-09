@@ -26,8 +26,19 @@ REFRESH_TOKEN_SECRET = 's(s%_vxnc5zbinf))vlc7ubawq9(rv0pf@-u1k(3)hd+3h)ou4'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5000',
+    'http://localhost:3000',
+    'http://localhost:5000',
+    'https://127.0.0.1:3000',
+    'https://127.0.0.1:5000',
+    'https://localhost:3000',
+    'https://localhost:5000',
+    'https://ecmrce-suflowapi.herokuapp.com',
+    '127.0.0.1:5000',
+    '127.0.0.1:3000',
+    'localhost:3000',
+    'localhost:5000',
     'ecmrce-suflowapi.herokuapp.com',
 ]
 blackListedTokens = set()
@@ -56,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware',
 ]
 
 ROOT_URLCONF = 'ecommerce_api.urls'
@@ -123,19 +135,44 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 AUTH_USER_MODEL = 'user.Details'
 
-
+CSRF_COOKIE_DOMAIN = 'ecmrce-suflowapi.herokuapp.com'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+SESSION_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:5000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5000',
+    'http://localhost:3000',
+    'https://127.0.0.1:3000',
+    'https://127.0.0.1:5000',
+    'https://localhost:3000',
+    'https://localhost:5000',
+    '127.0.0.1:3000',
+    '127.0.0.1:5000',
+    'localhost:3000',
+    'localhost:5000',
+]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:5000',
     'http://127.0.0.1:3000',
     'http://localhost:5000',
     'http://localhost:3000',
+    'https://127.0.0.1:3000',
+    'https://127.0.0.1:5000',
+    'https://localhost:3000',
+    'https://localhost:5000',
+    '127.0.0.1:3000',
+    '127.0.0.1:5000',
+    'localhost:3000',
+    'localhost:5000',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
         'user.authentication.SafeJWTAuthentication',
     ],
 }
