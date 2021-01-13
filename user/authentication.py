@@ -8,6 +8,10 @@ import jwt
 
 class CSRFCheck(CsrfViewMiddleware):
     def _reject(self, request, reason):
+        if reason == 'Referer checking failed - no Referer.':
+            print("[+] No referer csrf failed error")
+            return None
+        print("[+] csrf verified!")
         return reason
 
 
@@ -17,6 +21,8 @@ class SafeJWTAuthentication(BaseAuthentication):
         User = get_user_model()
         authorization_header = request.headers.get('Authorization')
         xcsrf_token = request.headers.get('X-CSRFToken')
+        print("[+] csrftoken : ",end='')
+        print(xcsrf_token)
         if not authorization_header:
             return None
         try:
@@ -39,6 +45,7 @@ class SafeJWTAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed('User not found!')
         if not user.is_active:
             raise exceptions.AuthenticationFailed('User is inactive!')
+        print("[+] Access token verified!")
         self.enforce_csrf(request)
         return user, None
 

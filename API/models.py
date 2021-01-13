@@ -1,10 +1,8 @@
 import uuid
-
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
-
 from user.models import Details, Address
 
 
@@ -27,6 +25,7 @@ class Product(models.Model):
 class ProductDetails(models.Model):
     product_id = models.OneToOneField(Product, help_text='Select product ID', on_delete=models.CASCADE,
                                       primary_key=True)
+    brand = models.CharField(max_length=200, default=None, null=True)
     description = models.TextField(help_text='Description of the product', default='')
     countryOfOrigin = models.CharField(help_text="What's the Country of Origin", max_length=20, default=None)
     photos = ArrayField(models.CharField(max_length=450, default=None), blank=True, default=None,
