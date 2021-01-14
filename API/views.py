@@ -185,10 +185,16 @@ def products_view(request):
 
 def serialize_products_from_instance(products):
     serialized_products = ProductSerializer(products, many=True).data
-    products_result = {'total_products': 0, 'categories': fetch_categories_from_product_instance(products), 'products': []}
+    categories = fetch_categories_from_product_instance(products)
+    brands = fetch_brands_from_product_instance(products)
+    products_result = {'total_products': 0, 'categories': categories, 'brands': brands, 'products': []}
     totalProducts = len(serialized_products)
     for product in serialized_products:
+        product_detail = ProductDetails.objects.filter(product_id=product['productId']).first()
         product = dict(product)
+        product['brand'] = product_detail.brand
+        product['rating'] = product_detail.rating
+        product['discount'] = product_detail.discount
         products_result['products'].append(product)
     products_result['total_products'] = totalProducts
     return products_result
@@ -203,6 +209,16 @@ def fetch_categories_from_product_instance(products):
                 cate_s.add(category)
     categories_values = list(cate_s)
     return categories_values
+
+
+def fetch_brands_from_product_instance(products):
+    brand_values = list(products.values('productdetails__brand'))
+    print(brand_values)
+    brands = set()
+    for brand in brand_values:
+        brands.add(brand['productdetails__brand'])
+    brand_values = list(brands)
+    return brand_values
 
 
 @api_view(['GET'])

@@ -13,6 +13,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from corsheaders.defaults import default_headers
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -26,20 +28,15 @@ REFRESH_TOKEN_SECRET = 's(s%_vxnc5zbinf))vlc7ubawq9(rv0pf@-u1k(3)hd+3h)ou4'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'http://127.0.0.1:3000',
+    'ecmrce-suflowapi.herokuapp.com',
+    'localhost',
+    '127.0.0.1',
+    'https://ecmrce-suflowapi.herokuapp.com',
+    'https://ecmrce-suflow.netlify.app',
     'http://127.0.0.1:5000',
-    'http://localhost:3000',
-    'http://localhost:5000',
+    'http://127.0.0.1:3000',
     'https://127.0.0.1:3000',
     'https://127.0.0.1:5000',
-    'https://localhost:3000',
-    'https://localhost:5000',
-    'https://ecmrce-suflowapi.herokuapp.com',
-    '127.0.0.1:5000',
-    '127.0.0.1:3000',
-    'localhost:3000',
-    'localhost:5000',
-    'ecmrce-suflowapi.herokuapp.com',
 ]
 blackListedTokens = set()
 # Application definition
@@ -61,12 +58,12 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'corsheaders.middleware.CorsPostCsrfMiddleware',
 ]
 
@@ -135,6 +132,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 AUTH_USER_MODEL = 'user.Details'
 
+
 CSRF_COOKIE_DOMAIN = 'ecmrce-suflowapi.herokuapp.com'
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'None'
@@ -142,33 +140,22 @@ SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 SESSION_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:5000',
-    'http://127.0.0.1:3000',
-    'http://localhost:5000',
-    'http://localhost:3000',
-    'https://127.0.0.1:3000',
-    'https://127.0.0.1:5000',
-    'https://localhost:3000',
-    'https://localhost:5000',
-    '127.0.0.1:3000',
-    '127.0.0.1:5000',
+    'ecmrce-suflowapi.herokuapp.com',
+    'https://ecmrce-suflow.netlify.app',
+    '.netlify.app',
     'localhost:3000',
     'localhost:5000',
+    '127.0.0.1:5000',
+    '127.0.0.1:3000',
 ]
+CORS_ORIGIN_ALLOW_ALL = True
+
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = [
-    'http://127.0.0.1:5000',
-    'http://127.0.0.1:3000',
-    'http://localhost:5000',
-    'http://localhost:3000',
-    'https://127.0.0.1:3000',
-    'https://127.0.0.1:5000',
-    'https://localhost:3000',
-    'https://localhost:5000',
-    '127.0.0.1:3000',
-    '127.0.0.1:5000',
-    'localhost:3000',
-    'localhost:5000',
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'refreshtoken',
+    'Cookie',
+    'Set-Cookie',
 ]
 
 REST_FRAMEWORK = {
