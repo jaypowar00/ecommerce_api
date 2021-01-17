@@ -18,7 +18,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'ecmrce-suflowapi.herokuapp.com',
-    'http://shop-undrflw.herokuapp.com',
+    'shop-undrflw.herokuapp.com',
     'https://ecmrce-suflowapi.herokuapp.com',
     'https://shop-undrflw.herokuapp.com'
 ]
