@@ -1,7 +1,7 @@
 # ECom Django API
 
 ![ECom Build CI](https://github.com/StackUnderFlowHacks/ecommerce_api/workflows/ECom%20Test%20CI/badge.svg)
-![API URL](https://img.shields.io/badge/API-LINK-blueviolet)
+[![API URL](https://img.shields.io/badge/API-LINK-blueviolet)](https://shop-undrflw.herokuapp.com)
 
 ## How To Set Up Project Locally?
 

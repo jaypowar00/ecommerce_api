@@ -17,8 +17,10 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    'ecmrce-suflowapi.herokuapp.com/',
-    'shop-undrflw.herokuapp.com/'
+    'ecmrce-suflowapi.herokuapp.com',
+    'shop-undrflw.herokuapp.com',
+    'https://ecmrce-suflowapi.herokuapp.com',
+    'https://shop-undrflw.herokuapp.com'
 ]
 blackListedTokens = set()
 # Application definition
