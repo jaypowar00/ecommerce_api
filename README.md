@@ -1,21 +1,26 @@
+# ECom Django API
+
+![ECom Build CI](https://github.com/StackUnderFlowHacks/ecommerce_api/workflows/ECom%20Test%20CI/badge.svg)
+![API URL](https://img.shields.io/badge/API-LINK-blueviolet)
+
 ## How To Set Up Project Locally?
 
-## Create & Activate Virtualenv
+### Create & Activate Virtualenv
 
 ``` shell script
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-## Install Dependencies
+### Install Dependencies
 
 ``` shell script
 pip install -r requirements.txt
 ```
 
-## Add Database Settings
+### Add Database Settings
 
-### Create following environment variables :
+#### Create following environment variables :
 
 ```
     DB_NAME = <database name here> (default: postgres)
@@ -27,14 +32,14 @@ pip install -r requirements.txt
 
 ## Run Project
 
-### Do Migrations
+#### Do Migrations
 
 ``` shell script
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### Run Django server
+#### Run Django server
 
 ``` shell script
 python manage.py runserver
