@@ -1,42 +1,41 @@
-## How to setup project locally?
+## How To Set Up Project Locally?
 
-#### 1. Create virtualenv inside main project directory, and activate it
+## Create & Activate Virtualenv
 
 ``` shell script
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-#### Install all dependencies
+## Install Dependencies
 
 ``` shell script
 pip install -r requirements.txt
 ```
 
 ## Add Database Settings
-1. Create local_settings.py file
-``` shell script
-touch ecommerce_api/local_settings.py
+
+### Create following environment variables :
+
+```
+    DB_NAME = <database name here> (default: postgres)
+    DB_HOST_URL = <database url here> (default: localhost)
+    DB_PORT = <database port here> (default: 5432)
+    DB_USERNAME = <database username here> (default: postgres)
+    DB_PASSWORD = <database password here> (default: password)
 ```
 
-2. Add your database setting in it. (Change values according to your db setup)
-``` python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'PORT': '5432',
-        'HOST': 'localhost',
-        'USER': 'postgres',
-        'PASSWORD': 'password'
-    }
-}
-```
+## Run Project
 
-#### Run Django server
+### Do Migrations
 
 ``` shell script
 python manage.py makemigrations
 python manage.py migrate
+```
+
+### Run Django server
+
+``` shell script
 python manage.py runserver
 ```
