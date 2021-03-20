@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [
     'ecmrce-suflowapi.herokuapp.com',
     'localhost',
     '127.0.0.1',
+    'shop.underflow.com',
     'https://ecmrce-suflowapi.herokuapp.com',
     'https://ecmrce-suflow.netlify.app',
     'http://127.0.0.1:5000',
@@ -147,6 +148,7 @@ CSRF_TRUSTED_ORIGINS = [
     'localhost:5000',
     '127.0.0.1:5000',
     '127.0.0.1:3000',
+    'shop.underflow.com',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 
