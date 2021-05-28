@@ -1,3 +1,4 @@
+from django.template.context_processors import request
 from django.utils.text import slugify
 from rest_framework.response import Response
 from django.http import JsonResponse, QueryDict
@@ -14,19 +15,43 @@ from user.decorators import check_blacklist_token
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.core.paginator import *
+
+
+def get_paginated_products(serialized_products, page=None, per_page=5):
+    paginator = Paginator(serialized_products, per_page)
+    page_number = page
+    page = paginator.get_page(page_number)
+
+    products = []
+    for prods in page:
+        products.append(prods)
+
+    print('[+] data in pagination function: ', end='')
+    print(products)
+
+    return {'products': products, 'next_page': page.next_page_number() if page.has_next() else None,
+            'previous_page': page.previous_page_number() if page.has_previous() else None,
+            'total_products': paginator.count, 'total_pages': paginator.num_pages, 'current_page': page.number,
+            'current_page_products': len(products)}
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def products_view(request):
-    print("query parameters : ", end="")
+    print("[+] query parameters : ", end="")
     query_params = dict(request.query_params)
+    page_no_query = query_params['page'][0] if 'page' in query_params else 1
+    if 'page' in query_params:
+        del query_params['page']
     print(query_params)
+    print('[+] page no.: '+str(page_no_query))
     query_params_n = len(query_params)
     done_query_param_n = 0
-    print("no of params : " + str(query_params_n))
+    print("[+] no. of params : " + str(query_params_n))
     products = Product.objects.all()
     categories_values = fetch_categories_from_product_instance(products)
+    print('[+] categories: ', end='')
     print(categories_values)
     query_errors = []
     if query_params_n > 0:
@@ -36,31 +61,84 @@ def products_view(request):
                 del query_params['price>']
                 done_query_param_n += 1
                 if price_filter.isdigit():
-                    products = products.filter(price__gte = int(price_filter))
+                    products = products.filter(price__gte=int(price_filter))
                     resultProducts = serialize_products_from_instance(products)
                     if len(query_errors) > 0:
-                        return Response({'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'errors': query_errors,
+                            'error': True
+                        })
                     if done_query_param_n == query_params_n:
-                        return Response({'response': resultProducts, 'status': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'error': False
+                        })
                 else:
                     query_errors.append("invalid value for query parameter 'price>'")
                     if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False, 'error': True})
+                        return Response({
+                            'response': query_errors,
+                            'status': False,
+                            'error': True
+                        })
             elif 'price<' in query_params:
                 price_filter = str(query_params['price<'][0])
                 del query_params['price<']
                 done_query_param_n += 1
                 if price_filter.isdigit():
-                    products = products.filter(price__lte = int(price_filter))
+                    products = products.filter(price__lte=int(price_filter))
                     resultProducts = serialize_products_from_instance(products)
                     if len(query_errors) > 0:
-                        return Response({'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'errors': query_errors,
+                            'error': True
+                        })
                     if done_query_param_n == query_params_n:
-                        return Response({'response': resultProducts, 'status': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True
+                        })
                 else:
                     query_errors.append("invalid value for query parameter 'price<'")
                     if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False, 'error': True})
+                        return Response({
+                            'response': query_errors,
+                            'status': False,
+                            'error': True
+                        })
             elif 'cate' in query_params:
                 category_query = query_params['cate'][0]
                 del query_params['cate']
@@ -73,14 +151,38 @@ def products_view(request):
                     products = temp_products
                     resultProducts = serialize_products_from_instance(products)
                     if len(query_errors) > 0:
-                        return Response(
-                            {'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'errors': query_errors,
+                            'error': True
+                        })
                     if done_query_param_n == query_params_n:
-                        return Response({'response': resultProducts, 'status': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True
+                        })
                 else:
                     query_errors.append("invalid value for query parameter 'cate'")
                     if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False})
+                        return Response({
+                            'response': query_errors,
+                            'status': False
+                        })
             elif 'pay' in query_params:
                 pay_opt = query_params['pay'][0]
                 del query_params['pay']
@@ -94,14 +196,38 @@ def products_view(request):
                         products = products.filter(paymentOption='Online')
                     resultProducts = serialize_products_from_instance(products)
                     if len(query_errors) > 0:
-                        return Response(
-                            {'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'errors': query_errors,
+                            'error': True
+                        })
                     if done_query_param_n == query_params_n:
-                        return Response({'response': resultProducts, 'status': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True
+                        })
                 else:
                     query_errors.append({'response': "invalid value for query parameter 'pay'"})
                     if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False})
+                        return Response({
+                            'response': query_errors,
+                            'status': False
+                        })
             elif 'stock' in query_params:
                 stock = query_params['stock'][0]
                 del query_params['stock']
@@ -113,13 +239,38 @@ def products_view(request):
                         products = products.filter(isInStock=False)
                     resultProducts = serialize_products_from_instance(products)
                     if len(query_errors) > 0:
-                        return Response({'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'errors': query_errors,
+                            'error': True
+                        })
                     if done_query_param_n == query_params_n:
-                        return Response({'response': resultProducts, 'status': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True
+                        })
                 else:
                     query_errors.append({'response': "invalid value for query parameter 'stock'"})
                     if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False})
+                        return Response({
+                            'response': query_errors,
+                            'status': False
+                        })
             elif 'rating_l' in query_params:
                 rate_l = query_params['rating_l'][0]
                 del query_params['rating_l']
@@ -128,14 +279,38 @@ def products_view(request):
                     products = products.filter(productdetails__rating__lte=float(rate_l))
                     resultProducts = serialize_products_from_instance(products)
                     if len(query_errors) > 0:
-                        return Response(
-                            {'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'errors': query_errors,
+                            'error': True
+                        })
                     if done_query_param_n == query_params_n:
-                        return Response({'response': resultProducts, 'status': True})
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True
+                        })
                 else:
                     query_errors.append({'response': "invalid value for query parameter 'rating_l'"})
                     if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False})
+                        return Response({
+                            'response': query_errors,
+                            'status': False
+                        })
             elif 'rating_g' in query_params:
                 rate_g = query_params['rating_g'][0]
                 del query_params['rating_g']
@@ -143,15 +318,39 @@ def products_view(request):
                 if len(rate_g) > 0 and rate_g.isdigit:
                     products = products.filter(productdetails__rating__gte=float(rate_g))
                     resultProducts = serialize_products_from_instance(products)
+                    pg_result = get_paginated_products(resultProducts['products'], page_no_query)
                     if len(query_errors) > 0:
-                        return Response(
-                            {'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'errors': query_errors,
+                            'error': True
+                        })
                     if done_query_param_n == query_params_n:
-                        return Response({'response': resultProducts, 'status': True})
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True,
+                            'error': False
+                        })
                 else:
                     query_errors.append({'response': "invalid value for query parameter 'rating_l'"})
                     if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False})
+                        return Response({
+                            'response': query_errors,
+                            'status': False
+                        })
             elif 'orderby' in query_params:
                 orderby = query_params['orderby'][0]
                 del query_params['orderby']
@@ -167,29 +366,82 @@ def products_view(request):
                         products = products.order_by(orderby)
                     if done_query_param_n == query_params_n:
                         resultProducts = serialize_products_from_instance(products)
+                        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
                         if len(query_errors) > 0:
-                            return Response({'response': resultProducts, 'status': True, 'errors': query_errors, 'error': True})
-                        return Response({'response': resultProducts, 'status': True})
+                            return Response({
+                                'response': {
+                                    'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                    'total_products': pg_result['total_products'],
+                                    'total_pages': pg_result['total_pages'],
+                                    'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                    'current_page': pg_result['current_page'],
+                                    'previous_page': pg_result['previous_page'],
+                                    'current_page_products': pg_result['current_page_products']
+                                },
+                                'status': True,
+                                'errors': query_errors,
+                                'error': True
+                            })
+                        return Response({
+                            'response': {
+                                'categories': resultProducts['categories'], 'brands': resultProducts['brands'],
+                                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                                'products': pg_result['products'], 'next_page': pg_result['next_page'],
+                                'current_page': pg_result['current_page'], 'previous_page': pg_result['previous_page'],
+                                'current_page_products': pg_result['current_page_products']
+                            },
+                            'status': True
+                        })
                 else:
                     query_errors.append('invalid orderby value received in url query')
                     if done_query_param_n == query_params_n:
-                        return Response({'response': query_errors, 'status': False, 'error': True})
+                        return Response({
+                            'response': query_errors,
+                            'status': False,
+                            'error': True
+                        })
 
     if query_params_n == 0:
+        print("[+] products: ", end="")
+        print(products)
         resultProducts = serialize_products_from_instance(products.order_by('productId'))
-        resultProducts['categories'] = categories_values
-        return Response({'response': resultProducts, 'status': True})
+        pg_result = get_paginated_products(resultProducts['products'], page_no_query)
+        return Response({
+            'response': {
+                'total_products': pg_result['total_products'], 'total_pages': pg_result['total_pages'],
+                'next_page': pg_result['next_page'], 'current_page': pg_result['current_page'],
+                'previous_page': pg_result['previous_page'],
+                'current_page_products': pg_result['current_page_products'], 'categories': categories_values,
+                'brands': resultProducts['brands'], 'products': pg_result['products']
+            },
+            'status': True
+        })
     else:
-        return Response({'response': 'invalid url request', 'status': False})
+        return Response({
+            'response': 'invalid url request',
+            'status': False
+        })
 
 
 def serialize_products_from_instance(products):
     serialized_products = ProductSerializer(products, many=True).data
-    products_result = {'total_products': 0, 'categories': fetch_categories_from_product_instance(products), 'products': []}
+    categories = fetch_categories_from_product_instance(products)
+    brands = fetch_brands_from_product_instance(products)
+    products_result = {'total_products': 0, 'categories': categories, 'brands': brands, 'products': []}
     totalProducts = len(serialized_products)
     for product in serialized_products:
-        product = dict(product)
-        products_result['products'].append(product)
+        product_detail = ProductDetails.objects.filter(product_id=product['productId']).first()
+        product_temp = dict(product)
+        # print('[+] brand: ', end='')
+        # print(product_detail.brand)
+        # print('[+] rating: ', end='')
+        # print(str(product_detail.rating))
+        # print('[+] discount: ', end='')
+        # print(product_detail.discount)
+        product_temp['brand'] = product_detail.brand
+        product_temp['rating'] = product_detail.rating
+        product_temp['discount'] = product_detail.discount
+        products_result['products'].append(product_temp)
     products_result['total_products'] = totalProducts
     return products_result
 
@@ -203,6 +455,17 @@ def fetch_categories_from_product_instance(products):
                 cate_s.add(category)
     categories_values = list(cate_s)
     return categories_values
+
+
+def fetch_brands_from_product_instance(products):
+    brand_values = list(products.values('productdetails__brand'))
+    print('[+] Brands: ', end='')
+    print(brand_values)
+    brands = set()
+    for brand in brand_values:
+        brands.add(brand['productdetails__brand'])
+    brand_values = list(brands)
+    return brand_values
 
 
 @api_view(['GET'])
@@ -271,7 +534,9 @@ def create_product(request):
         ]
         for fields in required_fields:
             if fields not in jsonData:
-                return Response({'response': 'missing one of the required fields for product creation in request', 'fields': {'required_fields': required_fields, 'optional_fields': optional_fields}, 'status': False})
+                return Response({'response': 'missing one of the required fields for product creation in request',
+                                 'fields': {'required_fields': required_fields, 'optional_fields': optional_fields},
+                                 'status': False})
         product_name = jsonData['name']
         product_slug = slugify(product_name) + "-" + str(shortuuid.ShortUUID().random(length=12))
         product_price = jsonData['price']
@@ -281,10 +546,12 @@ def create_product(request):
         product_manufacturer = jsonData['manufacturer'] if 'manufacturer' in jsonData else 'Anonymous'
         product_brand = jsonData['brand'] if 'brand' in jsonData else None
         product_paymentOption = jsonData['paymentOption'] if 'paymentOption' in jsonData else 'Cash On Delivery'
-        product_description = jsonData['description'] if 'description' in jsonData else 'description not provided by seller'
+        product_description = jsonData[
+            'description'] if 'description' in jsonData else 'description not provided by seller'
         product_countryOfOrigin = jsonData['countryOfOrigin'] if 'countryOfOrigin' in jsonData else 'Anonymous'
         product_photos = jsonData['products'] if 'products' in jsonData and type(jsonData['products']) == list else []
-        product_categories = jsonData['categories'] if 'categories' in jsonData and type(jsonData['categories']) == list else []
+        product_categories = jsonData['categories'] if 'categories' in jsonData and type(
+            jsonData['categories']) == list else []
         product_rating = jsonData['rating'] if 'rating' in jsonData else '0.0'
         product_discount = jsonData['discount'] if 'discount' in jsonData else None
         product_coupons = jsonData['coupons'] if 'coupons' in jsonData and type(jsonData['coupons']) == list else []
@@ -359,7 +626,7 @@ def update_product(request):
             "stock",
             "paymentOption",
         ]
-        product_details_fields =[
+        product_details_fields = [
             "description",
             "brand",
             "countryOfOrigin",
@@ -404,9 +671,11 @@ def update_product(request):
                 coupons=updated_product_data['coupons']
             )
             updated_product_details.save()
-            return Response({'response': f'product(id:{product_id}) data has been successfully updated', 'status': True})
+            return Response(
+                {'response': f'product(id:{product_id}) data has been successfully updated', 'status': True})
         else:
-            return Response({'response': 'product did not updated as no product data received from request', 'status': False})
+            return Response(
+                {'response': 'product did not updated as no product data received from request', 'status': False})
     else:
         return Response({'response': 'missing query parameter for product identification', 'status': False})
 
@@ -426,7 +695,8 @@ def delete_product(request):
     User = get_user_model()
     user = User.objects.filter(id=payload['user_id']).first()
     if user is None:
-        return Response({'response': '(unauthorized access) User associated with received access token not found!', 'status': False})
+        return Response({'response': '(unauthorized access) User associated with received access token not found!',
+                         'status': False})
     query_params = request.query_params
     if len(query_params) > 0 and 'id' in query_params and query_params['id'].isdigit:
         product_id = int(query_params['id'])

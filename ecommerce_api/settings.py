@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from corsheaders.defaults import default_headers
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -130,12 +132,17 @@ SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 SESSION_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
     '127.0.0.1',
-    'localhost'
+    'localhost',
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1',
     'http://localhost'
+]
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'refreshtoken',
+    'Cookie',
+    'Set-Cookie',
 ]
 
 REST_FRAMEWORK = {

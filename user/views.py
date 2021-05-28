@@ -181,9 +181,9 @@ def logout(request):
 
 @api_view(['POST'])
 @check_blacklist_token
-def refresh_token(request):
+def refresh_token_view(request):
     User = get_user_model()
-    refresh_token = request.COOKIES.get('refreshtoken')
+    refresh_token = request.headers.get('refreshtoken')
     if not refresh_token:
         return Response({'response': 'authentication credential missing!', 'status': False})
     try:
@@ -197,7 +197,12 @@ def refresh_token(request):
     if user is None:
         return Response({'response': 'user not found!', 'status': False})
     access_token = generate_access_token(user)
-    return Response({'access_token': access_token, 'status': True})
+    csrf_token = get_token(request)
+    return Response({
+        'access_token': access_token,
+        'csrf_token': csrf_token,
+        'status': True
+    })
 
 
 @api_view(['POST'])

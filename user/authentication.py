@@ -18,10 +18,13 @@ class CSRFCheck(CsrfViewMiddleware):
 class SafeJWTAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
+        print("___")
+        print(request.COOKIES)
+        print("___")
         User = get_user_model()
         authorization_header = request.headers.get('Authorization')
         xcsrf_token = request.headers.get('X-CSRFToken')
-        print("[+] csrftoken : ",end='')
+        print("[+] csrftoken : ", end='')
         print(xcsrf_token)
         if not authorization_header:
             return None
